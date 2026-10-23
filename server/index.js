@@ -7,12 +7,13 @@ const app = require('./app');
 const env = require('./config/env');
 const { pool } = require('./db/pool');
 
-const server = app.listen(env.PORT, () => {
+const server = app.listen(env.PORT, '0.0.0.0', () => {
   console.log(`\n══════════════════════════════════════════════════`);
   console.log(`  Shivalya Agrotech Server`);
   console.log(`  Environment: ${env.NODE_ENV}`);
   console.log(`  Port:        ${env.PORT}`);
-  console.log(`  Frontend:    http://localhost:${env.PORT}`);
+  console.log(`  Local:       http://localhost:${env.PORT}`);
+  console.log(`  LAN (Phone): http://192.168.29.102:${env.PORT}`);
   console.log(`  Admin:       http://localhost:${env.PORT}/admin`);
   console.log(`  API:         http://localhost:${env.PORT}/api/v1/health`);
   console.log(`══════════════════════════════════════════════════\n`);

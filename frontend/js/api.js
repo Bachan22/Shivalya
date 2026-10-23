@@ -41,12 +41,45 @@ const api = {
     }
   },
 
-  /** Fetch all products (with optional search query) */
-  async getProducts(query) {
-    const params = new URLSearchParams();
-    if (query) params.set('q', query);
-    params.set('limit', '100');
-    return this.get('/products?' + params.toString());
+  /** Helper to serialize filter params into URLSearchParams */
+  _buildQuery(queryOrParams) {
+    if (!queryOrParams) return new URLSearchParams({ limit: '100' });
+    if (typeof queryOrParams === 'string') {
+      const sp = new URLSearchParams({ limit: '100' });
+      if (queryOrParams.trim()) sp.set('q', queryOrParams.trim());
+      return sp;
+    }
+    const sp = new URLSearchParams();
+    for (const [k, v] of Object.entries(queryOrParams)) {
+      if (v === null || v === undefined || v === '') continue;
+      if (k === 'attr' && typeof v === 'object') {
+        for (const [ak, av] of Object.entries(v)) {
+          if (Array.isArray(av)) {
+            av.forEach(val => sp.append(`attr[${ak}]`, val));
+          } else if (av !== null && av !== undefined && av !== '') {
+            sp.append(`attr[${ak}]`, av);
+          }
+        }
+      } else if (Array.isArray(v)) {
+        v.forEach(val => sp.append(k, val));
+      } else {
+        sp.set(k, v);
+      }
+    }
+    if (!sp.has('limit')) sp.set('limit', '100');
+    return sp;
+  },
+
+  /** Fetch all products (with optional search query or filter params object) */
+  async getProducts(queryOrParams) {
+    const sp = this._buildQuery(queryOrParams);
+    return this.get('/products?' + sp.toString());
+  },
+
+  /** Fetch dynamic facets for given filter state */
+  async getFacets(queryOrParams) {
+    const sp = this._buildQuery(queryOrParams);
+    return this.get('/products/facets?' + sp.toString());
   },
 
   /** Fetch a single product by slug (with variants and images) */

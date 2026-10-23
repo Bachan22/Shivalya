@@ -1,1 +1,176 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Products | Shivalya Agrotech Producer Company</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/style.css"></head><body><div id="hdr"></div><div class="pagehead"><div class="wrap"><div class="eb">Shivalya Agrotech</div><h1>Our Products</h1><p>Agricultural &amp; industrial materials in multiple sizes, GSM and micron.</p></div></div><section class="s"><div class="wrap"><div class="grid g3" id="plist"></div></div></section><section class="s bg"><div class="wrap"><div class="sh"><h2>Mulching film price list</h2></div><div id="pt"></div><p style="margin-top:10px;color:var(--mu)">Jute thread: 6 ply ₹130/kg, 7 ply ₹140/kg, 8 ply ₹150/kg. Transport charges included.</p></div></section><div id="ftr"></div><script src="js/api.js"></script><script src="js/main.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a2e1a">
+  <title>Products | Shivalya Agrotech Producer Company</title>
+  <meta name="description" content="Browse our agricultural mulching films, jute thread, agricultural plastic rolls, pre-cut sheets, and yarn cones with full specifications and direct manufacturer pricing.">
+  <meta property="og:site_name" content="Shivalya Agrotech Producer Company Limited">
+  <meta property="og:title" content="Our Products &amp; Price List | Shivalya Agrotech">
+  <meta property="og:description" content="Direct manufacturer pricing on mulching films, jute threads, and agricultural plastics. Pan-India delivery available.">
+  <meta property="og:image" content="img/field-black.jpg">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="img/logo.svg">
+  <link rel="shortcut icon" href="img/logo.svg">
+  <link rel="preload" as="image" href="img/black-rolls.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="img/jute-hanks.jpg" fetchpriority="high">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="products-page">
+  <div id="hdr"></div>
+
+  <!-- a) Page Header Band (Dark green, compact, never clipped) -->
+  <header class="prod-pagehead">
+    <div class="wrap">
+      <div class="eb">Direct Manufacturer Pricing</div>
+      <div class="prod-head-row">
+        <h1>Our Products</h1>
+        <span class="prod-count-badge" id="prod-count-badge" aria-live="polite">Loading products...</span>
+      </div>
+      <p class="prod-head-subtitle">Agricultural &amp; industrial materials in multiple sizes, GSM and micron manufactured to BIS standards.</p>
+    </div>
+  </header>
+
+  <!-- b) Sticky Toolbar under Header -->
+  <section class="prod-toolbar-sticky" id="prod-toolbar">
+    <div class="wrap">
+      <div class="prod-toolbar-inner">
+        <!-- Search Input -->
+        <div class="prod-search-box">
+          <span class="prod-search-icon" aria-hidden="true">🔍</span>
+          <input type="search" id="prod-search-input" placeholder="Search by name, spec, or category..." aria-label="Search products" autocomplete="off">
+          <button type="button" id="prod-search-clear" class="prod-search-clear" aria-label="Clear search" style="display:none">&times;</button>
+        </div>
+
+        <!-- Mobile Filter Button (Badge for active filters) -->
+        <button type="button" class="prod-filter-trigger" id="prod-filter-trigger" aria-haspopup="dialog" aria-expanded="false">
+          <span class="pft-icon" aria-hidden="true">⚙️</span>
+          <span>Filters</span>
+          <span class="pft-badge" id="prod-filter-badge" style="display:none">0</span>
+        </button>
+
+        <!-- Sort Select -->
+        <div class="prod-sort-box">
+          <label for="prod-sort-select" class="prod-sort-label">Sort:</label>
+          <select id="prod-sort-select" aria-label="Sort products">
+            <option value="relevance">Relevance</option>
+            <option value="name_asc">Name A-Z</option>
+            <option value="name_desc">Name Z-A</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="newest">Newest</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- c) Active-Filter Chips Row -->
+      <div class="prod-active-chips-wrap" id="prod-active-chips" style="display:none">
+        <span class="pac-label">Active Filters:</span>
+        <div class="pac-chips-list" id="pac-chips-list"></div>
+        <button type="button" class="pac-clear-all" id="pac-clear-all">Clear all</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Layout (Desktop: 260px Sticky Sidebar + Results Grid) -->
+  <main class="prod-main-section">
+    <div class="wrap prod-layout">
+      <!-- Desktop Sidebar Filters -->
+      <aside class="prod-sidebar" id="prod-sidebar" aria-label="Product filters">
+        <div class="prod-sidebar-header">
+          <h2>Filter Products</h2>
+          <button type="button" class="prod-sidebar-reset" id="prod-sidebar-reset">Reset</button>
+        </div>
+        <div class="prod-filter-content" id="prod-sidebar-filters">
+          <!-- Dynamic facet groups rendered here -->
+        </div>
+      </aside>
+
+      <!-- Products Grid & Results Area -->
+      <div class="prod-results-area">
+        <!-- Grid of Products (Pre-rendered skeletons prevent CLS) -->
+        <div class="prod-grid" id="plist">
+          <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w-80"></div><div class="sk-line w-50"></div><div class="sk-line w-30"></div></div></div>
+          <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w-80"></div><div class="sk-line w-50"></div><div class="sk-line w-30"></div></div></div>
+          <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w-80"></div><div class="sk-line w-50"></div><div class="sk-line w-30"></div></div></div>
+          <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w-80"></div><div class="sk-line w-50"></div><div class="sk-line w-30"></div></div></div>
+          <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w-80"></div><div class="sk-line w-50"></div><div class="sk-line w-30"></div></div></div>
+          <div class="skeleton-card" aria-hidden="true"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w-80"></div><div class="sk-line w-50"></div><div class="sk-line w-30"></div></div></div>
+        </div>
+
+        <!-- e) Empty State -->
+        <div class="prod-empty-state" id="prod-empty-state" style="display:none">
+          <div class="pes-icon">🔍</div>
+          <h3>No products match your filters</h3>
+          <p>Try clearing some filters or searching with different keywords.</p>
+          <div class="pes-actions">
+            <button type="button" class="btn btn-hero-solid" id="pes-clear-btn">Clear all filters</button>
+            <a class="btn btn-hero-wa" id="pes-wa-btn" href="https://wa.me/919950337442?text=Hello%20Shivalya%20Agrotech%2C%20I%20am%20looking%20for%20a%20product%20not%20listed%20on%20your%20website." target="_blank" rel="noopener">
+              Ask on WhatsApp &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Sheet Filters Modal -->
+  <div class="prod-sheet-overlay" id="prod-sheet-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Filter products">
+    <div class="prod-sheet-backdrop" id="prod-sheet-backdrop"></div>
+    <div class="prod-sheet-panel" id="prod-sheet-panel">
+      <div class="prod-sheet-grab-bar">
+        <div class="prod-sheet-handle"></div>
+      </div>
+      <div class="prod-sheet-header">
+        <h3>Filters</h3>
+        <button type="button" class="prod-sheet-close" id="prod-sheet-close" aria-label="Close filters">&times;</button>
+      </div>
+      <div class="prod-sheet-body" id="prod-sheet-filters">
+        <!-- Dynamic facet groups rendered here -->
+      </div>
+      <div class="prod-sheet-footer">
+        <button type="button" class="btn btn-outline" id="prod-sheet-clear">Clear</button>
+        <button type="button" class="btn btn-hero-solid" id="prod-sheet-apply">
+          Show <span id="prod-sheet-count">0</span> products
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- f) Bottom Custom Size Banner -->
+  <section class="prod-custom-banner">
+    <div class="wrap">
+      <div class="pcb-box">
+        <div class="pcb-content">
+          <span class="pcb-badge">Custom Manufacturing</span>
+          <h2>Can't find your size? We make custom sizes.</h2>
+          <p>From 20 to 100 micron thickness, customized widths up to 6 feet, and special punching or UV blends for orchards and open fields.</p>
+        </div>
+        <a class="btn pcb-wa-btn" href="https://wa.me/919950337442?text=Hello%20Shivalya%20Agrotech%2C%20I%20need%20a%20custom%20size%20specification." target="_blank" rel="noopener">
+          WhatsApp Your Requirement &rarr;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Price table for mulching film (at bottom) -->
+  <section class="s bg prod-table-section">
+    <div class="wrap">
+      <div class="sh">
+        <h2>Mulching Film Standard Price List</h2>
+      </div>
+      <div id="pt"></div>
+      <p style="margin-top:12px;color:var(--mu);font-size:13.5px">Jute thread: 6 ply &#8377;130/kg, 7 ply &#8377;140/kg, 8 ply &#8377;150/kg. Transport charges included across North India.</p>
+    </div>
+  </section>
+
+  <div id="ftr"></div>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

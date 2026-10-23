@@ -41,52 +41,30 @@ router.get('/categories', async (_req, res, next) => {
   } catch (err) { next(err); }
 });
 
+const { queryProducts, queryFacets } = require('../../services/productFilter');
+
 // ── GET /products ─────────────────────────────────────────────
 router.get('/products', async (req, res, next) => {
   try {
-    const { category, q, featured, page = '1', limit = '50' } = req.query;
-    const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
-    const offset = (pageNum - 1) * limitNum;
-
-    let where = ['p.is_active = 1'];
-    let params = [];
-
-    if (category) {
-      where.push('c.slug = ?');
-      params.push(category);
-    }
-    if (featured === '1' || featured === 'true') {
-      where.push('p.is_featured = 1');
-    }
-    if (q && q.trim()) {
-      const search = q.trim();
-      // Use LIKE for partial matching (works better for short queries)
-      where.push('(p.name LIKE ? OR p.short_description LIKE ? OR p.description LIKE ?)');
-      const like = `%${search}%`;
-      params.push(like, like, like);
-    }
-
-    const whereClause = where.length ? 'WHERE ' + where.join(' AND ') : '';
-
-    const countSql = `SELECT COUNT(*) as total FROM products p LEFT JOIN categories c ON p.category_id = c.id ${whereClause}`;
-    const [countRows] = await pool.execute(countSql, params);
-    const total = countRows[0].total;
-
-    const sql = `SELECT p.id, p.slug, p.name, p.short_description, p.image_path, p.price_unit, p.is_featured,
-                        c.name as category_name, c.slug as category_slug
-                 FROM products p
-                 LEFT JOIN categories c ON p.category_id = c.id
-                 ${whereClause}
-                 ORDER BY p.sort_order
-                 LIMIT ? OFFSET ?`;
-    params.push(limitNum, offset);
-    const [rows] = await pool.execute(sql, params);
-
+    res.setHeader('Cache-Control', 'public, max-age=60');
+    const result = await queryProducts(req.query);
     res.json({
       success: true,
-      data: rows,
-      pagination: { page: pageNum, limit: limitNum, total, pages: Math.ceil(total / limitNum) },
+      data: result.products,
+      pagination: result.pagination,
+      appliedFilters: result.appliedFilters,
+    });
+  } catch (err) { next(err); }
+});
+
+// ── GET /products/facets ──────────────────────────────────────
+router.get('/products/facets', async (req, res, next) => {
+  try {
+    res.setHeader('Cache-Control', 'public, max-age=60');
+    const facets = await queryFacets(req.query);
+    res.json({
+      success: true,
+      data: facets,
     });
   } catch (err) { next(err); }
 });

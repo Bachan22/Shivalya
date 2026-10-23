@@ -28,6 +28,10 @@ app.use(cors({
   credentials: true,
 }));
 
+// ── Compression ───────────────────────────────────────────────
+const compression = require('compression');
+app.use(compression());
+
 // ── Body parsing ──────────────────────────────────────────────
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
@@ -71,10 +75,17 @@ app.use((req, _res, next) => {
   next();
 });
 
+// ── Favicon handler ───────────────────────────────────────────
+app.get('/favicon.ico', (_req, res) => {
+  res.setHeader('Content-Type', 'image/svg+xml');
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'img', 'logo.svg'));
+});
+
 // ── Static files ──────────────────────────────────────────────
 // Serve frontend (HTML, CSS, JS, images)
 app.use(express.static(path.join(__dirname, '..', 'frontend'), {
   extensions: ['html'],
+  maxAge: 3600000,
 }));
 
 // Serve uploaded images
