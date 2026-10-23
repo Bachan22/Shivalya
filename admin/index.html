@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard | Shivalya Agrotech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span style="font-size:24px">🌿</span>
+      <div>
+        <h2>SHIVALYA</h2>
+        <small>Agrotech Producer Co.</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+        <span>📊</span> Dashboard
+      </div>
+      <div class="nav-item" data-tab="products" onclick="switchTab('products')">
+        <span>📦</span> Products & Variants
+      </div>
+      <div class="nav-item" data-tab="categories" onclick="switchTab('categories')">
+        <span>📑</span> Categories
+      </div>
+      <div class="nav-item" data-tab="quotes" onclick="switchTab('quotes')">
+        <span>💬</span> Quotes
+      </div>
+      <div class="nav-item" data-tab="messages" onclick="switchTab('messages')">
+        <span>✉</span> Messages
+      </div>
+      <div class="nav-item" data-tab="gallery" onclick="switchTab('gallery')">
+        <span>🖼</span> Gallery
+      </div>
+      <div class="nav-item" data-tab="industries" onclick="switchTab('industries')">
+        <span>🏭</span> Industries
+      </div>
+      <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+        <span>⚙</span> Site Settings
+      </div>
+      <div class="nav-item" data-tab="pages" onclick="switchTab('pages')">
+        <span>📄</span> Page Content
+      </div>
+      <div class="nav-item" data-tab="audit" onclick="switchTab('audit')">
+        <span>📜</span> Audit Trail
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div>Local SQL Admin</div>
+      <div style="margin-top:4px"><a href="/" target="_blank" style="color:#a5d6a7;text-decoration:none">↗ View Live Website</a></div>
+    </div>
+  </aside>
+
+  <!-- Main Wrapper -->
+  <div class="main-wrapper">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <h1 id="pageTitle">Dashboard Overview</h1>
+      </div>
+      <div class="topbar-right">
+        <span class="user-badge">Logged in: <b id="userBadge">admin@shivalya.com</b></span>
+        <button class="btn btn-secondary btn-sm" onclick="openChangePasswordModal()">🔑 Password</button>
+        <button class="btn btn-secondary btn-sm" onclick="handleLogout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+      <!-- 1. DASHBOARD VIEW -->
+      <section id="view-dashboard" class="view-section active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <small>Active Products</small>
+            <div class="stat-val" id="statTotalProducts">-</div>
+          </div>
+          <div class="stat-card">
+            <small>Quote Requests</small>
+            <div class="stat-val" id="statTotalQuotes">-</div>
+          </div>
+          <div class="stat-card">
+            <small>Contact Messages</small>
+            <div class="stat-val" id="statTotalMessages">-</div>
+          </div>
+          <div class="stat-card">
+            <small>Gallery Items</small>
+            <div class="stat-val" id="statTotalGallery">-</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Recent Quote Requests</h3>
+            <button class="btn btn-secondary btn-sm" onclick="switchTab('quotes')">View All Quotes →</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ref #</th>
+                  <th>Customer</th>
+                  <th>Product</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="recentQuotesBody">
+                <tr><td colspan="5" style="text-align:center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. PRODUCTS VIEW -->
+      <section id="view-products" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-toolbar">
+              <input type="text" class="search-input" placeholder="Search products..." oninput="filterProducts(this.value)">
+            </div>
+            <button class="btn btn-primary" onclick="openAddProductModal()">+ Add Product</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name / Slug</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Variants</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody">
+                <tr><td colspan="6" style="text-align:center">Loading products...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. CATEGORIES VIEW -->
+      <section id="view-categories" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Add New Category</h3>
+          </div>
+          <form id="addCategoryForm" onsubmit="handleAddCategory(event)" style="padding:16px 20px;display:flex;gap:12px;flex-wrap:wrap">
+            <input type="text" id="newCatName" placeholder="Category Name" required style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:6px;flex:1">
+            <input type="text" id="newCatSlug" placeholder="Slug (optional)" style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:6px;flex:1">
+            <input type="text" id="newCatDesc" placeholder="Short description" style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:6px;flex:2">
+            <button type="submit" class="btn btn-primary">+ Add</button>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Existing Categories</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Slug</th>
+                  <th>Description</th>
+                  <th>Sort</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="categoriesTableBody">
+                <tr><td colspan="5" style="text-align:center">Loading categories...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. QUOTES VIEW -->
+      <section id="view-quotes" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-toolbar">
+              <input type="text" class="search-input" placeholder="Search ref, customer, phone..." oninput="filterQuotesSearch(this.value)">
+              <select id="quotesStatusFilter" class="select-filter" onchange="loadQuotes()">
+                <option value="">All Statuses</option>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="quoted">Quoted</option>
+                <option value="won">Won</option>
+                <option value="lost">Lost</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary" onclick="exportQuotesCsv()">📥 Export CSV</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ref # / Date</th>
+                  <th>Customer Info</th>
+                  <th>Requirement</th>
+                  <th>Status</th>
+                  <th>Admin Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="quotesTableBody">
+                <tr><td colspan="6" style="text-align:center">Loading quotes...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. MESSAGES VIEW -->
+      <section id="view-messages" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Contact Messages</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Sender / Date</th>
+                  <th>Contact</th>
+                  <th>Subject & Message</th>
+                  <th>Status</th>
+                  <th>Change Status</th>
+                </tr>
+              </thead>
+              <tbody id="messagesTableBody">
+                <tr><td colspan="5" style="text-align:center">Loading messages...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. GALLERY VIEW -->
+      <section id="view-gallery" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Add Gallery Item</h3>
+          </div>
+          <form id="addGalleryForm" onsubmit="handleAddGallery(event)" style="padding:16px 20px;display:flex;gap:12px;flex-wrap:wrap">
+            <input type="text" id="galTitle" placeholder="Item Title" required style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:6px;flex:1">
+            <input type="text" id="galCategory" placeholder="Category (e.g. Products, Factory)" style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:6px;flex:1">
+            <input type="text" id="galImagePath" placeholder="Image path (e.g. img/rolls.jpg or /uploads/...)" required style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:6px;flex:2">
+            <input type="file" accept="image/png,image/jpeg,image/webp" onchange="uploadImageFile(this, 'galImagePath')" style="font-size:12px">
+            <button type="submit" class="btn btn-primary">+ Add</button>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Gallery Items</h3>
+          </div>
+          <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:16px" id="galleryGrid">
+            Loading gallery...
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. INDUSTRIES VIEW -->
+      <section id="view-industries" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Industries We Serve</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Slug</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="industriesTableBody">
+                <tr><td colspan="5" style="text-align:center">Loading industries...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. SETTINGS VIEW -->
+      <section id="view-settings" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Company & Contact Details</h3>
+          </div>
+          <form id="settingsForm" onsubmit="handleSaveAllSettings(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Company Legal Name</label>
+                <input type="text" id="setting_company_name" required>
+              </div>
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" id="setting_phone" required>
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="setting_email" required>
+              </div>
+              <div class="form-group">
+                <label>WhatsApp Number (digits with country code, e.g. 919950337442)</label>
+                <input type="text" id="setting_whatsapp_number" required>
+              </div>
+              <div class="form-group">
+                <label>GSTIN Number</label>
+                <input type="text" id="setting_gstin" required>
+              </div>
+              <div class="form-group">
+                <label>Business Hours</label>
+                <input type="text" id="setting_business_hours">
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1">
+                <label>Full Address</label>
+                <textarea id="setting_address" rows="3" required></textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save All Settings</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- 9. PAGES VIEW -->
+      <section id="view-pages" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Editable Page Sections (About, Quality, Infrastructure)</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Page</th>
+                  <th>Section Key</th>
+                  <th>Title</th>
+                  <th>Body Preview</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pagesTableBody">
+                <tr><td colspan="5" style="text-align:center">Loading page sections...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. AUDIT TRAIL VIEW -->
+      <section id="view-audit" class="view-section">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Audit Trail Log</h3>
+            <button class="btn btn-secondary btn-sm" onclick="loadAudit()">↻ Refresh</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Admin User</th>
+                  <th>Action</th>
+                  <th>Target Table / ID</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <tr><td colspan="5" style="text-align:center">Loading audit log...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ── MODALS ── -->
+
+  <!-- Product Modal (Add / Edit) -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="productModalTitle">Add Product</h3>
+        <button class="modal-close" onclick="closeModal('productModal')">×</button>
+      </div>
+      <form id="productForm" onsubmit="handleProductSave(event)">
+        <div class="modal-body">
+          <input type="hidden" id="productId">
+          <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" id="prodName" required placeholder="Mulching Film">
+          </div>
+          <div class="form-group">
+            <label>Slug (URL identifier)</label>
+            <input type="text" id="prodSlug" required placeholder="mulching-film">
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="prodCategory" required></select>
+          </div>
+          <div class="form-group">
+            <label>Short Description (card summary)</label>
+            <input type="text" id="prodShortDesc" placeholder="20, 25 and 30 micron UV stabilized...">
+          </div>
+          <div class="form-group">
+            <label>Full Description</label>
+            <textarea id="prodDesc" rows="4" placeholder="Detailed product specifications..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Image Path or Upload</label>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="prodImagePath" placeholder="img/black-rolls.jpg or /uploads/..." style="flex:1">
+              <input type="file" accept="image/png,image/jpeg,image/webp" onchange="uploadImageFile(this, 'prodImagePath')" style="font-size:12px;width:120px">
+            </div>
+          </div>
+          <div style="display:flex;gap:20px;margin-top:12px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px">
+              <input type="checkbox" id="prodActive" checked> Active (Visible on site)
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px">
+              <input type="checkbox" id="prodFeatured"> Featured on Home
+            </label>
+          </div>
+          <div class="form-group" style="margin-top:12px">
+            <label>Sort Order</label>
+            <input type="number" id="prodSort" value="0" style="width:100px">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('productModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Variants Modal -->
+  <div class="modal-overlay" id="variantModal">
+    <div class="modal-dialog" style="max-width:800px">
+      <div class="modal-header">
+        <h3>Variants for: <span id="variantModalProductTitle"></span></h3>
+        <button class="modal-close" onclick="closeModal('variantModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive" style="margin-bottom:20px">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Label</th>
+                <th>Micron</th>
+                <th>Width</th>
+                <th>Length</th>
+                <th>Weight</th>
+                <th>Ply</th>
+                <th>Price</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="variantsTableBody"></tbody>
+          </table>
+        </div>
+
+        <h4 style="font-size:14px;margin-bottom:12px;color:var(--primary)">+ Add New Variant</h4>
+        <form id="addVariantForm" onsubmit="handleAddVariant(event)">
+          <input type="hidden" id="variantProductId">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:10px">
+            <div>
+              <label style="font-size:11px;color:#64748b">Label</label>
+              <input type="text" id="newVarLabel" required placeholder="20 micron, 4 ft" style="width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#64748b">Thickness (µ)</label>
+              <input type="number" id="newVarThickness" placeholder="20" style="width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#64748b">Width (ft)</label>
+              <input type="number" step="0.01" id="newVarWidth" placeholder="4" style="width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#64748b">Length (m)</label>
+              <input type="number" step="0.01" id="newVarLength" placeholder="400" style="width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#64748b">Weight (kg)</label>
+              <input type="number" step="0.01" id="newVarWeight" placeholder="7.5" style="width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#64748b">Ply</label>
+              <input type="number" id="newVarPly" placeholder="6" style="width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#64748b">Price (₹)</label>
+              <input type="number" step="0.01" id="newVarPrice" placeholder="900" style="width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#64748b">Unit</label>
+              <input type="text" id="newVarPriceUnit" placeholder="roll / kg" style="width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px">
+            </div>
+          </div>
+          <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+            <label style="font-size:12px;display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="newVarTransport"> Includes Transport
+            </label>
+            <button type="submit" class="btn btn-primary btn-sm">+ Add Variant</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('variantModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote Status Modal -->
+  <div class="modal-overlay" id="quoteModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Update Quote Status</h3>
+        <button class="modal-close" onclick="closeModal('quoteModal')">×</button>
+      </div>
+      <form id="quoteStatusForm" onsubmit="handleQuoteStatusSave(event)">
+        <div class="modal-body">
+          <input type="hidden" id="quoteModalId">
+          <p>Reference: <b id="quoteModalRef"></b></p>
+          <p style="margin-top:4px;font-size:13px;color:#64748b">Customer: <span id="quoteModalCustomer"></span></p>
+          <p style="margin-top:4px;font-size:13px;color:#64748b">Requirement: <span id="quoteModalProduct"></span></p>
+          <div class="form-group" style="margin-top:16px">
+            <label>Status</label>
+            <select id="quoteModalStatus" required>
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="quoted">Quoted</option>
+              <option value="won">Won</option>
+              <option value="lost">Lost</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Admin Notes</label>
+            <textarea id="quoteModalNotes" rows="3" placeholder="Add follow-up details, quotes given, etc."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('quoteModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Status</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Page Content Modal -->
+  <div class="modal-overlay" id="pageModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="pageSectionHeader">Edit Page Section</h3>
+        <button class="modal-close" onclick="closeModal('pageModal')">×</button>
+      </div>
+      <form id="pageForm" onsubmit="handleSavePageSection(event)">
+        <div class="modal-body">
+          <input type="hidden" id="pageSectionId">
+          <div class="form-group">
+            <label>Section Title</label>
+            <input type="text" id="pageSectionTitle" required>
+          </div>
+          <div class="form-group">
+            <label>Section Body (HTML supported)</label>
+            <textarea id="pageSectionBody" rows="6"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('pageModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div class="modal-overlay" id="changePwModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Change Password</h3>
+        <button class="modal-close" onclick="closeModal('changePwModal')">×</button>
+      </div>
+      <form id="changePwForm" onsubmit="handleChangePassword(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="currentPw" required placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>New Password (min 6 chars)</label>
+            <input type="password" id="newPw" required minlength="6" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="confirmNewPw" required minlength="6" placeholder="••••••••">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('changePwModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastBox"></div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+{
+  "info": {
+    "name": "Shivalya Agrotech API",
+    "_postman_id": "c62b9213-912a-4315-bb82-990a124a8721",
+    "description": "REST API documentation for Shivalya Agrotech full-stack web platform.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Public Endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/health"
+          }
+        },
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/categories"
+          }
+        },
+        {
+          "name": "Get Products (Search & Filter)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products?q=mulch&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"],
+              "query": [
+                { "key": "q", "value": "mulch" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Product Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/products/mulching-film"
+          }
+        },
+        {
+          "name": "Get Gallery Items",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/gallery"
+          }
+        },
+        {
+          "name": "Get Industries",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/industries"
+          }
+        },
+        {
+          "name": "Get Public Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/settings/public"
+          }
+        },
+        {
+          "name": "Get Page Content Sections",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/pages/about"
+          }
+        },
+        {
+          "name": "Submit Quick Quote",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_name\": \"Mulching Film\",\n  \"specification\": \"25 micron, 4 ft\",\n  \"quantity\": \"10 rolls\",\n  \"name\": \"Test Farmer\",\n  \"phone\": \"9876543210\",\n  \"source_page\": \"index.html\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/quotes"
+          }
+        },
+        {
+          "name": "Submit Contact Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Kumar\",\n  \"phone\": \"9950337442\",\n  \"email\": \"farmer@example.com\",\n  \"subject\": \"Bulk order for Jute thread\",\n  \"message\": \"Need 500 kg 8 ply jute thread for nursery.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/contact"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Endpoints",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@shivalya.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/auth/login"
+          }
+        },
+        {
+          "name": "Get Admin Profile (Me)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/auth/me"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"Admin@123\",\n  \"new_password\": \"NewSecurePass@2026\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/auth/change-password"
+          }
+        },
+        {
+          "name": "Admin Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/admin/auth/logout"
+          }
+        },
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/products"
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category_id\": 1,\n  \"name\": \"Test Product\",\n  \"slug\": \"test-product\",\n  \"short_description\": \"Test short desc\",\n  \"description\": \"Full description\",\n  \"is_active\": 1,\n  \"is_featured\": 0,\n  \"sort_order\": 0\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/admin/products"
+          }
+        },
+        {
+          "name": "List Quotes (with filters)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/quotes?status=new"
+          }
+        },
+        {
+          "name": "Export Quotes CSV",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/quotes/export/csv"
+          }
+        },
+        {
+          "name": "List Contact Messages",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/contact-messages"
+          }
+        },
+        {
+          "name": "Get Audit Log",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/admin/audit-log"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "csrfToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
